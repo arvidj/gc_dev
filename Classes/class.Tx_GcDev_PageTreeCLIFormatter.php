@@ -45,15 +45,16 @@
 class Tx_GcDev_PageTreeCLIFormatter {
 	protected $dataProvider = NULL;
 
-	public function __construct($dataProvider) {
+	public function __construct($dataProvider, $maxDepth = FALSE) {
 		$this->dataProvider = $dataProvider;
+		$this->maxDepth = $maxDepth;
 	}
 
 	public function format($node) {
-		$this->formatAux($node, '', '');
+		$this->formatAux($node, '', '', 1);
 	}
 
-	protected function formatAux($node, $ind, $leaf) {
+	protected function formatAux($node, $ind, $leaf, $level) {
 		$label = '[' . $node->getId() . '] ' . (!$node->getText() ? '[null]' : $node->getText());
 		echo $leaf . $label  . PHP_EOL;
 
@@ -65,7 +66,10 @@ class Tx_GcDev_PageTreeCLIFormatter {
 			$leaf = $ind . ($last ? '`' : '|') . '-- ';
 
 			$ind2 = $last ? $ind . '   ' : $ind . '|  ';
-			$this->formatAux($node,  $ind2, $leaf);
+
+			if ($this->maxDepth === FALSE || $level < $this->maxDepth) {
+				$this->formatAux($node,  $ind2, $leaf, $level + 1);
+			}
 		}
 	}
 }
